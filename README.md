@@ -1,3 +1,3 @@
 # DotCom-Game-Java
-Source - Head First Java 
-<img src="./gamedrawimg.png" width="128"/>
+Source - Head First Java <br>
+<img src="./gamedrawimg.png" width="400"/>
