@@ -3,12 +3,12 @@ import java.util.*;
 
 class DotComBust {
     // instantiate the GameHelper instance variable, named helper
-    GameHelper helper = new GameHelper();
+    private GameHelper helper = new GameHelper();
     // nstantiate an ArrayList to hold the list of DotComs (initially three) Call it dotComsList
-    private ArrayList<dotcom> dotComsList = new ArrayList<DotCom>();
+    private ArrayList<DotCom> dotComsList = new ArrayList<DotCom>();
     private int numOfGuesses = 0;
 
-    private void setUpGame() {
+     void setUpGame() {
         // make three DotCom objects and name them
         DotCom one = new DotCom();
         one.setName("Pets.com");
@@ -39,34 +39,34 @@ class DotComBust {
         }
     }
 
-    private void startPlaying() {
+     void startPlaying() {
         while(!dotComsList.isEmpty()) {
             //We could have also written "Enter a guess" in helpers get User Input then why here 
             String userGuess = helper.getUserInput("Enter a guess");
-            helper.checkUserGuess(userGuess);
+            checkUserGuess(userGuess);
         }
         finishGame();
     }
 
-    private void checkUserGuess(String userGuess) {
+     void checkUserGuess(String userGuess) {
         numOfGuesses++;
         String result = "miss";
-        for (DotCom dotComToSet : dotComsList) {
-            result = DotCom.checkYourself(userGuess);
+         for(int x = 0; x < dotComsList.size(); x++) {
+            result = dotComsList.get(x).checkYourself(userGuess);
             if(result.equals("hit")) {
                 break;
             }
             if(result.equals("kill")) {
-                dotComsList.remove(dotComToSet);
+                dotComsList.remove(x);
                 break;
             }
             System.out.println(result);
         }
     }
 
-    private void finishGame() {
+     void finishGame() {
         System.out.println("Game Over");
-        if (userGuess <= 18) { 
+        if (numOfGuesses <= 18) { 
             System.out.println("Congratulations.. You took only " + numOfGuesses + " guesses");
             System.out.println(" You got out before your options sank.");
         } else {
@@ -85,7 +85,7 @@ class DotComBust {
 
 
 
-public class DotCom {
+class DotCom {
     private ArrayList<String> locationCells;
     private String name;
 
@@ -124,6 +124,75 @@ public class DotCom {
 // (that prompts the user and reads input from the command-line), the
 // helper’s Big Service is to create the cell locations for the DotComs.
 
-public class GameHelper {
+ class GameHelper {
+    //I am wondering what these below variables are used for ?
+    private static final String alphabet = "abcdefg";
+    private int gridLength = 7;
+    private int gridSize = 49;
+    private int [] grid = new int[gridSize];
+    private int comCount = 0; 
 
+    // jab input hi lena h tho itna validation
+    //  code kiu, they could have also return this above right ? why
+    public String getUserInput(String prompt) {
+        String inputLine = null;
+        System.out.print(prompt + " ");
+        try {
+            BufferedReader is = new BufferedReader(
+            new InputStreamReader(System.in));
+            inputLine = is.readLine();
+            if (inputLine.length() == 0 ) return null;
+        } catch (IOException e) {
+            System.out.println("IOException: " + e);
+        }
+        return inputLine.toLowerCase();
+    }
+
+
+    public ArrayList<String> placeDotCom(int comSize) {
+        ArrayList<String> alphaCells = new ArrayList<String>();
+        String temp = null;
+        int [] coords = new int[comSize];
+        int attempts = 0;// current attempts counter
+        boolean success = false; // flag = found a good location ?
+        int location = 0; // current starting location
+
+        comCount++;
+        int incr = 1; // set horizontal increment
+        if ((comCount % 2) == 1) { // if odd dot com (place vertically)
+            incr = gridLength; // set vertical increment
+        }
+        while ( !success & attempts++ < 200 ) { // main search loop (32)
+            location = (int) (Math.random() * gridSize); // get random starting point
+            //System.out.print(“ try “ + location);
+            int x = 0; // nth position in dotcom to place
+            success = true; // assume success
+            while (success && x < comSize)  { // look for adjacent unused spots
+                if (grid[location] == 0) {
+                    coords[x++] = location; // save location
+                    location += incr; // try ‘next’ adjacent
+                        if (location >= gridSize){ // out of bounds - ‘bottom’
+                            success = false; // failure
+                        }
+                    if (x>0 && (location % gridLength == 0)) { // out of bounds - right edge
+                        success = false; // failure
+                    }
+                } else { // found already used location
+                    // System.out.print(“ used “ + location);
+                    success = false; // failure
+                }
+            }
+        } 
+        return alphaCells;
+    }
+}
+
+
+class main {
+    public static void main(String arg[]) {
+        DotComBust game = new DotComBust();
+        game.setUpGame();
+        game.startPlaying();
+        game.finishGame();
+    }
 }
